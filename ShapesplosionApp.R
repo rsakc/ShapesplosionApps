@@ -382,7 +382,7 @@ ui <- fluidPage(
                   choices =  all_groups,
                   multiple = TRUE,
                   selectize = TRUE,
-                  selected = c("donkey","donkeytest")),
+                  selected = "test"),
       
       uiOutput(outputId = "player_out"),
       
@@ -621,7 +621,7 @@ output$tests_out <- renderPrint({
               t.test(YVariable ~ XVariable)
             
             } else {
-              "Not enough observations to run the Two Sample T-Test"
+              "Not enough observations to run the Two Sample T-Test."
               }
             
           } else{
@@ -661,7 +661,7 @@ output$tests_out <- renderPrint({
               t.test(YVariable ~ XVariable, paired = TRUE)
                 
               } else {
-                "Not enough observations to run the Paired T-Test"
+                "Not enough observations to run the Paired T-Test."
               } 
               
             } else{
