@@ -62,8 +62,30 @@ for(i in 2:nrow(data)){
   }
 }
 
+#Creating Order Column
+data$Order <- NA
+
+counter <- 1
+data$Order[1] <- 1
+
+for(i in 2:nrow(data)){
+  
+  if(data$Identifier[i] == data$Identifier[i - 1]){
+    counter <- counter + 1
+    
+    data$Order[i] <- counter 
+    
+  } else{
+    counter <- 1
+    data$Order[i] <- counter
+  }
+}
+
+
 #### Paired MatchingScheme Data
-dataMS <- data
+
+#Only wins
+dataMS <- data %>% filter(Win == "1")
 
 
 #Remove players with only one row of data
@@ -144,13 +166,34 @@ for(i in unique(dataMS$Identifier)){
   }
 }
 
-#Removing marked players (Sorting Finished)
+#Removing marked players 
 dataMS <- dataMS %>% filter(!(Identifier %in% IndexNumShapes))
 
 
+#Creating Order Column for Matching Scheme Data (Sorting Finished)
+dataMS$Order <- NA
+
+counter <- 1
+dataMS$Order[1] <- 1
+
+for(i in 2:nrow(dataMS)){
+  
+  if(dataMS$Identifier[i] == dataMS$Identifier[i - 1]){
+    counter <- counter + 1
+    
+    dataMS$Order[i] <- counter 
+    
+  } else{
+    counter <- 1
+    dataMS$Order[i] <- counter
+  }
+}
+
 
 #### Paired NumShapes Data
-dataNumS <- data
+
+#Only wins
+dataNumS <- data %>% filter(Win == "1")
 
 #Remove players with only one row of data
 #Removing players with only one type of NumShapes
@@ -229,15 +272,32 @@ for(i in unique(dataNumS$Identifier)){
   }
 }
 
-#Removing marked players (Sorting Finished)
+#Removing marked players 
 dataNumS <- dataNumS %>% filter(!(Identifier %in% IndexMScheme))
 
+#Creating Order Column for Num Shapes Data (Sorting Finished)
+dataNumS$Order <- NA
 
+counter <- 1
+dataNumS$Order[1] <- 1
 
-
+for(i in 2:nrow(dataNumS)){
+  
+  if(dataNumS$Identifier[i] == dataNumS$Identifier[i - 1]){
+    counter <- counter + 1
+    
+    dataNumS$Order[i] <- counter 
+    
+  } else{
+    counter <- 1
+    dataNumS$Order[i] <- counter
+  }
+}
 
 #### Paired Var Data
-datavar <- data
+
+#Only wins
+datavar <- data %>% filter(Win == "1")
 
 #Remove players with only one row of data
 #Keeping only players who played the same matching scheme more than once
@@ -322,6 +382,27 @@ for(i in unique(datavar$Identifier)){
 datavar <- datavar %>% filter(!(Identifier %in% IndexN))
 
 
+#Creating Order Column for datavar before creating dataset for each var
+datavar$Order <- NA
+
+counter <- 1
+datavar$Order[1] <- 1
+
+for(i in 2:nrow(datavar)){
+  
+  if(datavar$Identifier[i] == datavar$Identifier[i - 1]){
+    counter <- counter + 1
+    
+    datavar$Order[i] <- counter 
+    
+  } else{
+    counter <- 1
+    datavar$Order[i] <- counter
+  }
+}
+
+
+
 #Keeping if there are exactly 2 levels
 #Separate checks for each of the three variables
 Indexv1 <- numeric()
@@ -359,6 +440,27 @@ datav3 <- datavar %>% filter(!(Identifier %in% Indexv3))
 
 ## Win Data
 datawin <- data %>% filter(Win == "1")
+
+#Creating Order Column for Win Data
+datawin$Order <- NA
+
+counter <- 1
+datawin$Order[1] <- 1
+
+for(i in 2:nrow(datawin)){
+  
+  if(datawin$Identifier[i] == datawin$Identifier[i - 1]){
+    counter <- counter + 1
+    
+    datawin$Order[i] <- counter 
+    
+  } else{
+    counter <- 1
+    datawin$Order[i] <- counter
+  }
+}
+
+
 
 
 #For UI Inputs
@@ -401,14 +503,14 @@ ui <- fluidPage(
       selectInput(inputId = "color",
                   label = "Color by:",
                   choices = c("MatchingScheme", "NumShapes", "Var1", "Var2", "Var3", 
-                              "ReqTime", "DisplayTime"),
+                              "ReqTime", "DisplayTime", "Win"),
                   selected = "MatchingScheme",
                   multiple = FALSE),
       
       selectInput(inputId = "facets",
                   label = "Facet by:",
                   choices = c("None", "MatchingScheme", "NumShapes", "Var1", "Var2", "Var3", 
-                              "ReqTime", "DisplayTime"),
+                              "ReqTime", "DisplayTime", "Win"),
                   selected = "None",
                   multiple = FALSE),
       
@@ -419,7 +521,8 @@ ui <- fluidPage(
       
       selectInput(inputId = "datatype",
                   label = "Data Type:",
-                  choices = c("All Data", "Paired Data", "Win Data"),
+                  choices = c("All Data", "Paired MatchingScheme Data", "Paired NumShapes Data",
+                              "Paired Var1 Data", "Paired Var2 Data", "Paired Var3 Data", "Win Data"),
                   selected = "All Data",
                   multiple = FALSE),
       
@@ -465,29 +568,27 @@ server <- function(input, output,session){
     } else if(input$datatype == "Win Data"){
       dataR <- datawin
       
-      #Paired Data
-    } else if(input$datatype == "Paired Data"){
+      #Paired Matching Scheme Data
+    } else if(input$datatype == "Paired MatchingScheme Data"){
+       dataR <- dataMS
+       
+      #Paired NumShapes Data
+    } else if(input$datatype == "Paired NumShapes Data"){
+      dataR <- dataNumS
       
-      if(input$xvar == "MatchingScheme"){
-        dataR <- dataMS
-        
-      } else if(input$xvar == "NumShapes"){
-        dataR <- dataNumS
-        
-      } else if(input$xvar == "Var1"){
-        dataR <- datav1
-        
-      } else if(input$xvar == "Var2"){
-        dataR <- datav2
-        
-      } else if(input$xvar == "Var3"){
-        dataR <- datav3
-        
-      } else if(input$xvar == "PlayerID"){
-        dataR <- data
-      }
+      #Paired Var 1 Data
+    } else if(input$datatype == "Paired Var1 Data"){
+      dataR <- datav1
+      
+      #Paired Var 2 Data
+    } else if(input$datatype == "Paired Var2 Data"){
+      dataR <- datav2
+      
+      #Paired Var 3 Data
+    } else if(input$datatype == "Paired Var3 Data"){
+      dataR <- datav3
     }
-    
+      
     dataR <- dataR %>% filter(GroupID %in% input$groupID, !(PlayerID %in% input$playerID))
     
     return(dataR)
@@ -642,7 +743,8 @@ output$tests_out <- renderPrint({
     } else if(input$tests == "Paired T-Test"){
       
       #Data Type must be paired
-      if(input$datatype == "Paired Data"){
+      if(input$datatype %in% c("Paired MatchingScheme Data", "Paired NumShapes Data", 
+                               "Paired Var1 Data", "Paired Var2 Data", "Paired Var3 Data")){
         
         #Facet must be set to none
         if(input$facets == "None"){
@@ -691,9 +793,6 @@ output$tests_out <- renderPrint({
       FacetVariable <- drop.levels(FacetVariable)
       FacetLevels <- nlevels(FacetVariable)
       
-      
-      #Data type is not Paired data
-      if(input$datatype != "Paired Data"){
         
         if(XLevels > 1 &  ColorLevels  > 1 & FacetLevels > 1){
       
@@ -762,12 +861,6 @@ output$tests_out <- renderPrint({
           return(tidyanova)
         }
         
-        #Error message since paired Data is selected  
-      } else{
-        "Either All Data or Win Data must be selected to run the ANOVA."
-      }
-    
-      
       
      #Block Design   
     } else if(input$tests == "Block Design"){
@@ -778,8 +871,6 @@ output$tests_out <- renderPrint({
       FacetLevels <- nlevels(FacetVariable)
       PlayerID <- plotData$PlayerID
       
-      #Data type is not Paired data
-      if(input$datatype != "Paired Data"){
         
         if(XLevels > 1 &  ColorLevels  > 1 & FacetLevels > 1){
           
@@ -848,13 +939,15 @@ output$tests_out <- renderPrint({
           return(tidyanova)
         }
         
-        #Error message since paired Data is selected  
-      } else{
-        "Either All Data or Win Data must be selected to run the ANOVA."
-      }
     }
+  
+  #Error message (not enough observations)
+  } else{
+    "Not enough observations to run a statistical test."
   }
-})
+
+  
+  })
 
 
 #Summary Table
