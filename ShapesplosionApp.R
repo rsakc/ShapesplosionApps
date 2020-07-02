@@ -18,7 +18,12 @@ data <- data %>% mutate(Date = str_sub(Date, 1, 10))
 data[is.na(data)] <- "None"
 
 #None to NA (For ANOVA)
-data["None"] <- NA
+data["None"] <- "None"
+data$None <- as.factor(data$None)
+
+#Lowercase
+data$PlayerID <- tolower(data$PlayerID)
+data$GroupID <- tolower(data$GroupID)
 
 #Converting to Columns to Factor
 data$PlayerID <- as.factor(data$PlayerID)
@@ -30,10 +35,6 @@ data$NumShapes <- as.factor(data$NumShapes)
 data$Var1 <- as.factor(data$Var1)
 data$Var2 <- as.factor(data$Var2)
 data$Var3 <- as.factor(data$Var3)
-
-#Lowercase
-data$PlayerID <- tolower(data$PlayerID)
-data$GroupID <- tolower(data$GroupID)
 
 
 
@@ -681,7 +682,7 @@ server <- function(input, output,session){
   }
 })
   
-  
+
   
 ##Statistical Tests
 output$tests_out <- renderPrint({
@@ -784,7 +785,6 @@ output$tests_out <- renderPrint({
       
       
       
-      
     ##ANOVA
     } else if(input$tests == "ANOVA"){
       
@@ -792,6 +792,10 @@ output$tests_out <- renderPrint({
       FacetVariable <- plotData %>% pull(input$facets)
       FacetVariable <- drop.levels(FacetVariable)
       FacetLevels <- nlevels(FacetVariable)
+      
+      
+      #We need enough observations
+      if(nrow(plotData) >= XLevels*ColorLevels*FacetLevels + 1){
       
         
         if(XLevels > 1 &  ColorLevels  > 1 & FacetLevels > 1){
@@ -861,8 +865,13 @@ output$tests_out <- renderPrint({
           return(tidyanova)
         }
         
+      #Error Message when there aren't enough observations   
+      } else{
+        "Not enough observations to run the ANOVA."
+      }
+        
       
-     #Block Design   
+     ##Block Design   
     } else if(input$tests == "Block Design"){
       
       #Pulling Facet Variable and PlayerID Variable
@@ -871,7 +880,9 @@ output$tests_out <- renderPrint({
       FacetLevels <- nlevels(FacetVariable)
       PlayerID <- plotData$PlayerID
       
-        
+      #We need enough observations
+      if(nrow(plotData) >= XLevels*ColorLevels*FacetLevels + 1){
+      
         if(XLevels > 1 &  ColorLevels  > 1 & FacetLevels > 1){
           
           anovatest <- aov(YVariable ~ PlayerID + XVariable + ColorVariable + FacetVariable + 
@@ -939,15 +950,15 @@ output$tests_out <- renderPrint({
           return(tidyanova)
         }
         
+      #Error Message when there aren't enough observations    
+      } else{
+        "Not enough observations to run the Block Design."
+      }
+        
     }
+  } 
   
-  #Error message (not enough observations)
-  } else{
-    "Not enough observations to run a statistical test."
-  }
-
-  
-  })
+})
 
 
 #Summary Table
@@ -987,7 +998,6 @@ observeEvent(input$color, {
 })
 
 
-
 #Download Data
 output$downloadData <- downloadHandler(
   filename = function() {
@@ -1004,11 +1014,3 @@ output$downloadData <- downloadHandler(
 
 #Running Shiny App
 shinyApp(ui = ui, server = server)
-  
-  
-  
-  
-  
-  
-
-
