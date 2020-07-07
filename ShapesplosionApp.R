@@ -7,7 +7,7 @@ library(ggplot2)
 library(dplyr)
 library(gdata)
 library(broom)
- 
+  
 #Shapesplosion Data
 data <- read_csv("https://www.stat2games.sites.grinnell.edu/data/shapesplosion/getdata.php")
 
