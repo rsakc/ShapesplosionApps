@@ -539,7 +539,13 @@ ui <- fluidPage(
                     label = "Show Summary Table",
                     value = FALSE),
       
-      downloadButton('downloadData', label = "Shapesplosion Data")),
+      downloadButton('downloadData', label = "Shapesplosion Data"),
+      
+      a(h5("Instructor Details"),
+        href="https://stat2labs.sites.grinnell.edu/shapesplosion.html", 
+        align="left", target = "_blank")
+      
+      ),
     
     
     mainPanel(
