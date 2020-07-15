@@ -1,4 +1,4 @@
-#Last Updated on July 14 2020
+#Last Updated on July 15 2020
 
 #Loading Libraries
 library(shiny)
@@ -10,8 +10,15 @@ library(dplyr)
 library(gdata)
 library(broom)
   
-#Shapesplosion Data
-data <- read_csv("https://www.stat2games.sites.grinnell.edu/data/shapesplosion/getdata.php")
+#Importing Data
+n <- sample(c(0,1), size = 1)
+
+if(n == 0){
+  data <- read_csv("https://www.stat2games.sites.grinnell.edu/data/shapesplosion/getdata.php")
+
+} else{
+  data <- read_csv("https://www.stat2games.sites.grinnell.edu/data/shapesplosion/getdata.php")
+}
 
 #Date Column
 data <- data %>% mutate(Date = str_sub(Date, 1, 10))
