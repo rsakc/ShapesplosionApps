@@ -1,4 +1,4 @@
-#Last Updated on July 20 2020
+#Last Updated on July 23 2020
 
 #Loading Libraries
 library(shiny)
@@ -44,7 +44,6 @@ data$NumShapes <- as.factor(data$NumShapes)
 data$Var1 <- as.factor(data$Var1)
 data$Var2 <- as.factor(data$Var2)
 data$Var3 <- as.factor(data$Var3)
-
 
 
 ##Creating Identifier Column
@@ -470,16 +469,11 @@ for(i in 2:nrow(datawin)){
   }
 }
 
-
-
-
 #For UI Inputs
 all_groups <- sort(unique(data$GroupID))
 
 
-
-
-#### UI
+##UI
 ui <- fluidPage(
   
   theme = shinytheme("readable"),
@@ -568,22 +562,16 @@ ui <- fluidPage(
                  fluidRow(
                    splitLayout(cellWidths = c("50%", "50%"), 
                                plotOutput("rplot1"), plotOutput("rplot2")))))
-   
-     
-    )
-      
-    
-  ))
+  
+    )))
                   
 
   
-#### Server
+##Server
 server <- function(input, output,session){
-  
   
   ##Reactive Data
   plotDataR <- reactive({
-    
     
     #All Data
     if(input$datatype == "All Data"){
@@ -692,6 +680,7 @@ server <- function(input, output,session){
           theme(strip.text = element_text(size = 16)) 
       }
       
+      #Returning visual
       return(myplot)
     
         
@@ -707,7 +696,6 @@ server <- function(input, output,session){
 })
   
 
-  
 ##Statistical Tests
 output$tests_out <- renderPrint({
   
@@ -806,7 +794,6 @@ output$tests_out <- renderPrint({
       } else{
         "Paired Data must be selected to run the Paired T-Test."
       }
-      
       
       
     ##ANOVA
@@ -1129,12 +1116,9 @@ output$tests_out <- renderPrint({
       } else{
         "Paired Data must be selected to run the Paired Randomization Test."
       }
-    
     }
   }
-  
 })
-
 
 
 #Residual Histogram (RPLOT 1)
@@ -1771,8 +1755,6 @@ output$rplot2 <- renderPlot({
         }
       } 
     }
-    
-    
   } 
 })
       
@@ -1824,10 +1806,8 @@ output$downloadData <- downloadHandler(
     write.csv(plotDataR(), con)
   })
 
-  
 #Closes Server
 }
-
 
 #Running Shiny App
 shinyApp(ui = ui, server = server)
